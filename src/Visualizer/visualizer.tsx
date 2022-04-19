@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { DisplayGraph } from '../SortingGraph/graph';
+import BubbleSort from '../Algorithms/bubblesort';
 
 const Visualizer = () => {
 
@@ -70,6 +71,7 @@ const Visualizer = () => {
     const AlgoDropdownWrapper = styled.div`
         display: flex;
         flex-direction: column;
+        align-items: center;
     `;
 
     const AlgoDropdownText = styled.h2`
@@ -93,10 +95,22 @@ const Visualizer = () => {
         }
     `;
 
-    const AlgoOptions = ['Sort1', 'Sort2', 'Sort3', 'Sort4']
+    const StartButton = styled.button`
+        color: black;
+        background-color: #F28482;
+        width: 5vw;
+        height: 3vh;
+        border-radius: 8%;
+        border: 2px solid #F28482;
+        cursor: pointer;
+        margin-top: 2vh;
+    `
+
+    const AlgoOptions = ['Bubble Sort', 'Sort2', 'Sort3', 'Sort4']
 
     const [rangeValue, setRangeValue] = useState('');
-    const [selectedOption, setSelectedOption] = useState('Sort1');
+    const [selectedOption, setSelectedOption] = useState('');
+    const [arrayState, setArrayState] = useState<string[]>([]);
     //for typescript, you need React.ChangeEvent<HTML...> for event functions
     const DisplayValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRangeValue(e.target.value)
@@ -109,6 +123,27 @@ const Visualizer = () => {
     console.log(selectedOption)
     const math: number = Number(rangeValue);
 
+    const setArray = () => {
+        let j = 1;
+        const graphArray = []
+        //let user change i
+        if (Number(rangeValue) > 1) {
+            while (j < Number(rangeValue) + 1){
+                graphArray.push(`${Math.floor((Math.random() * 60) + 1)}vh`);
+                j++;
+            }
+        }
+        setArrayState(graphArray);
+    }
+
+    const callBubbleSort = (array: string[]) => {
+        BubbleSort(array)
+    }
+
+    useEffect(() => {
+        setArray()
+    }, [rangeValue])
+
     //issue with slider value bc the thing always resets when i change the slider so the slider doesn't work properly
 
     return (
@@ -118,20 +153,21 @@ const Visualizer = () => {
                     <SliderValueText>
                         Array Size: {rangeValue}
                     </SliderValueText>
-                    <Slider type="range" min="2" max="20" plswork={math} onChange={e => DisplayValue(e)} />
+                    <Slider type="range" min="2" max="20" plswork={math} value={rangeValue} onChange={e => DisplayValue(e)} />
                 </SliderValueWrapper>
                 <AlgoDropdownWrapper>
                     <AlgoDropdownText>
                         Select an Algorithm
                     </AlgoDropdownText>
-                    <AlgoDropdownList onChange={AlgoOption}>
+                    <AlgoDropdownList onChange={AlgoOption} value={selectedOption}> {/* for select html tag, you need to add value = usestate when using onChange*/}
                         {AlgoOptions.map((option, index) => 
                         <option key={index} value={option}>{option}</option>
                         )}
                     </AlgoDropdownList>
+                    <StartButton>Start</StartButton>
                 </AlgoDropdownWrapper>
             </LeftWrapper>
-            <DisplayGraph rangeNumber={Number(rangeValue)} />
+            <DisplayGraph graphArray={arrayState} />
         </>
     )
 }

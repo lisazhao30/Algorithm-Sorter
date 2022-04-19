@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import BubbleSort from '../Algorithms/bubblesort';
 
 const Wrapper = styled.div`
     display: flex;
@@ -38,28 +39,22 @@ const randomNumber = () => {
 }
 
 interface DisplayGraphProps {
-    rangeNumber : number;
+    graphArray : string[];
 }
 
 export const DisplayGraph: React.FC<DisplayGraphProps> = (props) => {
-    let j = 1;
-    const graphArray = [];
-    //let user change i
-    if (props.rangeNumber > 1) {
-        while (j < props.rangeNumber + 1){
-            graphArray.push(randomNumber());
-            j++;
-        }
-    }
     return (
         <Wrapper>
             <GraphOutline>
-                {graphArray.map((numbers, index) => 
+                {props.graphArray.map((numbers, index) => 
                 <HeightBars height={numbers} key={index} />)}
             </GraphOutline>
         </Wrapper>
     )
+    
 }
+
+
 
 //you don't need to use return () when you can just not use {}
 // const Graph = () => {
