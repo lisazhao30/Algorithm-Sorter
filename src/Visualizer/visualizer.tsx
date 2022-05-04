@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { DisplayGraph } from '../SortingGraph/graph';
 import BubbleSort from '../Algorithms/bubblesort';
+import { StartAnimations } from '../SortingGraph/graph';
 
 const Visualizer = () => {
 
@@ -110,7 +111,7 @@ const Visualizer = () => {
 
     const [rangeValue, setRangeValue] = useState('');
     const [selectedOption, setSelectedOption] = useState('');
-    const [arrayState, setArrayState] = useState<string[]>([]);
+    const [arrayState, setArrayState] = useState<number[]>([]);
     //for typescript, you need React.ChangeEvent<HTML...> for event functions
     const DisplayValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         setRangeValue(e.target.value)
@@ -122,6 +123,7 @@ const Visualizer = () => {
     }
     console.log(selectedOption)
     const math: number = Number(rangeValue);
+    let isSwapping = false;
 
     const setArray = () => {
         let j = 1;
@@ -129,22 +131,42 @@ const Visualizer = () => {
         //let user change i
         if (Number(rangeValue) > 1) {
             while (j < Number(rangeValue) + 1){
-                graphArray.push(`${Math.floor((Math.random() * 60) + 1)}vh`);
+                graphArray.push(Math.floor((Math.random() * 60) + 1));
                 j++;
             }
         }
         setArrayState(graphArray);
     }
 
-    const callBubbleSort = (array: string[]) => {
-        BubbleSort(array)
-    }
-
     useEffect(() => {
         setArray()
     }, [rangeValue])
 
-    //issue with slider value bc the thing always resets when i change the slider so the slider doesn't work properly
+
+    const callBubbleSort = (arrayState: number[]) => {
+        BubbleSort(arrayState)
+    }
+
+    const default_color: string = '#4A148C';
+    const swap_color: string = '#F4511E';
+
+    const startAnimations = (sortingAlgorithm: (arrayState: number[]) => any) => {
+        const animations = sortingAlgorithm(arrayState);
+        for (let i = 0; i < animations.length; i++){
+            const changeColor = animations[i][0] === "first-comparison" || animations[i][0] === "second-comparison";
+            if (changeColor){
+                const [change, barOne, barTwo] = animations[i];
+                const color = (change === "first-comparison" ? default_color : swap_color);
+                if (i === animations.length - 1 || i === animations.length - 2 || i === animations.length - 3){
+                    setTimeout(() => {
+                        //insert styled component here
+                    }, i * 4)
+                }
+            }
+        }
+    }
+
+    console.log(arrayState)
 
     return (
         <>  
@@ -161,13 +183,13 @@ const Visualizer = () => {
                     </AlgoDropdownText>
                     <AlgoDropdownList onChange={AlgoOption} value={selectedOption}> {/* for select html tag, you need to add value = usestate when using onChange*/}
                         {AlgoOptions.map((option, index) => 
-                        <option key={index} value={option}>{option}</option>
+                            <option key={index} value={option}>{option}</option>
                         )}
                     </AlgoDropdownList>
-                    <StartButton>Start</StartButton>
+                    <StartButton onClick={() => BubbleSort(arrayState)}>Start</StartButton>
                 </AlgoDropdownWrapper>
             </LeftWrapper>
-            <DisplayGraph graphArray={arrayState} />
+            <DisplayGraph graphArray={arrayState} isSwapping={isSwapping} />
         </>
     )
 }
