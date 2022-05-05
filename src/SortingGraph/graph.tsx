@@ -85,21 +85,4 @@ export const DisplayGraph: React.FC<DisplayGraphProps> = (props) => {
             </GraphOutline>
         </Wrapper>
     )
-    
 }
-
-
-
-//you don't need to use return () when you can just not use {}
-// const Graph = () => {
-//     return (
-//         <Wrapper>
-//             <GraphOutline>
-//                 {GraphArrayFunction(10).map((numbers, index) => 
-//                 <HeightBars height={numbers} />)}
-//             </GraphOutline>
-//         </Wrapper>
-//     )
-// }
-
-// export default Graph

@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { DisplayGraph } from '../SortingGraph/graph';
 import BubbleSort from '../Algorithms/bubblesort';
+import QuickSort from '../Algorithms/quicksort';
+import MergeSort from '../Algorithms/mergesort';
 import { StartAnimations } from '../SortingGraph/graph';
 
 const Visualizer = () => {
@@ -107,7 +109,11 @@ const Visualizer = () => {
         margin-top: 2vh;
     `
 
-    const AlgoOptions = ['Bubble Sort', 'Sort2', 'Sort3', 'Sort4']
+    const AlgoOptions = [
+        {DisplayName: 'Bubble Sort', FunctionName: 'BubbleSort'},
+        {DisplayName: 'Quick Sort', FunctionName: 'QuickSort'},
+        {DisplayName: 'Merge Sort', FunctionName: 'MergeSort'}
+    ]
 
     const [rangeValue, setRangeValue] = useState('');
     const [selectedOption, setSelectedOption] = useState('');
@@ -166,8 +172,6 @@ const Visualizer = () => {
         }
     }
 
-    console.log(arrayState)
-
     return (
         <>  
             <LeftWrapper>
@@ -183,10 +187,11 @@ const Visualizer = () => {
                     </AlgoDropdownText>
                     <AlgoDropdownList onChange={AlgoOption} value={selectedOption}> {/* for select html tag, you need to add value = usestate when using onChange*/}
                         {AlgoOptions.map((option, index) => 
-                            <option key={index} value={option}>{option}</option>
+                            <option key={index} value={option.FunctionName}>{option.DisplayName}</option>
                         )}
                     </AlgoDropdownList>
-                    <StartButton onClick={() => BubbleSort(arrayState)}>Start</StartButton>
+                    <StartButton onClick={() => selectedOption.includes('BubbleSort') ? BubbleSort(arrayState) : 
+                    selectedOption.includes('QuickSort') ? QuickSort(arrayState) : null}>Start</StartButton>
                 </AlgoDropdownWrapper>
             </LeftWrapper>
             <DisplayGraph graphArray={arrayState} isSwapping={isSwapping} />
