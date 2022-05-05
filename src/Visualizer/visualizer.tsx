@@ -4,7 +4,6 @@ import { DisplayGraph } from '../SortingGraph/graph';
 import BubbleSort from '../Algorithms/bubblesort';
 import QuickSort from '../Algorithms/quicksort';
 import MergeSort from '../Algorithms/mergesort';
-import { StartAnimations } from '../SortingGraph/graph';
 
 const Visualizer = () => {
 
@@ -23,6 +22,11 @@ const Visualizer = () => {
         height: 20vh;
     `;
 
+
+    interface SliderProps {
+        changeSliderColor: number;
+    }
+
     const Slider = styled.input<SliderProps>`
         display: flex;
         align-self: center;
@@ -36,7 +40,7 @@ const Visualizer = () => {
             cursor: pointer;
             box-shadow: #111;
             background: ${(props) =>
-                `linear-gradient(to right, #F28482 0%, #F28482 ${props.plswork}%, #fff ${props.plswork}%, #fff 100%);`};
+                `linear-gradient(to right, #F28482 0%, #F28482 ${props.changeSliderColor}%, #fff ${props.changeSliderColor}%, #fff 100%);`};
             border-radius: 10px;
             border-style: solid;
             transition: box-shadow 0.2s ease-in-out;
@@ -60,10 +64,6 @@ const Visualizer = () => {
         }
         }
     `;
-
-    interface SliderProps {
-        plswork: number;
-    }
 
     const SliderValueText = styled.h2`
         @import url('https://fonts.googleapis.com/css2?family=Barlow&display=swap');
@@ -107,29 +107,32 @@ const Visualizer = () => {
         border: 2px solid #F28482;
         cursor: pointer;
         margin-top: 2vh;
+        &:hover {
+            transform: scale(1.1);
+        }
     `
+    const default_color: string = '#AFD0D6';
+    const swap_color: string = '#F28482';
+    const next_color: string = '#D2E59E';
+    const [rangeValue, setRangeValue] = useState('');
+    const [selectedOption, setSelectedOption] = useState('BubbleSort');
+    const [arrayState, setArrayState] = useState<number[]>([]);
+    const graphBar = document.getElementsByClassName('HeightBars') as HTMLCollectionOf<HTMLElement>;
+    //for typescript, you need React.ChangeEvent<HTML...> for event functions
+
+    const DisplayValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setRangeValue(e.target.value)
+    }
+    const AlgoOption = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setSelectedOption(value);
+    }
 
     const AlgoOptions = [
         {DisplayName: 'Bubble Sort', FunctionName: 'BubbleSort'},
         {DisplayName: 'Quick Sort', FunctionName: 'QuickSort'},
         {DisplayName: 'Merge Sort', FunctionName: 'MergeSort'}
     ]
-
-    const [rangeValue, setRangeValue] = useState('');
-    const [selectedOption, setSelectedOption] = useState('');
-    const [arrayState, setArrayState] = useState<number[]>([]);
-    //for typescript, you need React.ChangeEvent<HTML...> for event functions
-    const DisplayValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setRangeValue(e.target.value)
-    }
-
-    const AlgoOption = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-        setSelectedOption(value);
-    }
-    console.log(selectedOption)
-    const math: number = Number(rangeValue);
-    let isSwapping = false;
 
     const setArray = () => {
         let j = 1;
@@ -148,29 +151,47 @@ const Visualizer = () => {
         setArray()
     }, [rangeValue])
 
-
-    const callBubbleSort = (arrayState: number[]) => {
-        BubbleSort(arrayState)
-    }
-
-    const default_color: string = '#4A148C';
-    const swap_color: string = '#F4511E';
-
-    const startAnimations = (sortingAlgorithm: (arrayState: number[]) => any) => {
-        const animations = sortingAlgorithm(arrayState);
-        for (let i = 0; i < animations.length; i++){
-            const changeColor = animations[i][0] === "first-comparison" || animations[i][0] === "second-comparison";
-            if (changeColor){
-                const [change, barOne, barTwo] = animations[i];
-                const color = (change === "first-comparison" ? default_color : swap_color);
-                if (i === animations.length - 1 || i === animations.length - 2 || i === animations.length - 3){
+    const StartAnimating = (animatedArray: (string | number)[][]) => {
+        let lastIndex = 0;
+        for (let i = 0; i < animatedArray.length; i++){
+            const [type, barOne, barTwo] = animatedArray[i]
+            const barOneStyle = graphBar[barOne as number].style;
+            const doesBarTwoExist: boolean = (barTwo as number) < arrayState.length && Number.isInteger(barTwo as number);
+            const barTwoStyle = graphBar[doesBarTwoExist ? barTwo as number : barOne as number].style;
+            switch(type){
+                case 'index':
                     setTimeout(() => {
-                        //insert styled component here
-                    }, i * 4)
-                }
+                        if (lastIndex !== barOne){
+                            graphBar[lastIndex as number].style.backgroundColor = default_color;
+                            barOneStyle.backgroundColor = default_color;
+                            lastIndex = barOne as number;
+                        }
+                    }, i * 100)
+                    break;
+                case 'comparing':
+                    setTimeout(() => {
+                        if (barOne !== lastIndex){
+                            barOneStyle.backgroundColor = swap_color
+                        }
+                        if (barTwo !== lastIndex){
+                            barTwoStyle.backgroundColor = next_color
+                        }
+                    }, i * 100)
+                    break;
+                case 'swapping': //swap heights of the bars
+                    setTimeout(() => {
+                        if (doesBarTwoExist){
+                            const barOneHeight = barOneStyle.height;
+                            barOneStyle.height = barTwoStyle.height;
+                            barTwoStyle.height = barOneHeight;
+                        }
+                    }, i * 100)
+                    break;
+                default:
+                    break;
             }
         }
-    }
+    } 
 
     return (
         <>  
@@ -179,7 +200,7 @@ const Visualizer = () => {
                     <SliderValueText>
                         Array Size: {rangeValue}
                     </SliderValueText>
-                    <Slider type="range" min="2" max="20" plswork={math} value={rangeValue} onChange={e => DisplayValue(e)} />
+                    <Slider type="range" min="2" max="20" changeSliderColor={Number(rangeValue) / 20 * 100} value={rangeValue} onChange={e => DisplayValue(e)} />
                 </SliderValueWrapper>
                 <AlgoDropdownWrapper>
                     <AlgoDropdownText>
@@ -190,11 +211,11 @@ const Visualizer = () => {
                             <option key={index} value={option.FunctionName}>{option.DisplayName}</option>
                         )}
                     </AlgoDropdownList>
-                    <StartButton onClick={() => selectedOption.includes('BubbleSort') ? BubbleSort(arrayState) : 
-                    selectedOption.includes('QuickSort') ? QuickSort(arrayState) : null}>Start</StartButton>
+                    <StartButton onClick={() => selectedOption.includes('BubbleSort') ? StartAnimating(BubbleSort(arrayState)) : 
+                    selectedOption.includes('QuickSort') ? StartAnimating(QuickSort(arrayState)) : null}>Start</StartButton>
                 </AlgoDropdownWrapper>
             </LeftWrapper>
-            <DisplayGraph graphArray={arrayState} isSwapping={isSwapping} />
+            <DisplayGraph graphArray={arrayState} />
         </>
     )
 }

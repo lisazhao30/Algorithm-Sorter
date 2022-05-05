@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import BubbleSort from '../Algorithms/bubblesort';
+import './graph.scss';
 
 const Wrapper = styled.div`
     display: flex;
@@ -35,54 +36,21 @@ const HeightBars = styled.div<HeightBarsProps>`
 
 
 const Number: string = `${Math.floor((Math.random() * 100) + 1)}vh`
-console.log(Number);
-
-const default_color: string = '#4A148C';
-const swap_color: string = '#F4511E';
-// const [styledColor, setStyledColor] = useState('')
-
-
-export const StartAnimations = (arrayState: number[]) => {
-    // for (let i = 0; i < arrayState.length; i++){
-    //     if (i === arrayState.length - 1 || i === arrayState.length - 2 || i === arrayState.length - 3){
-    //         setTimeout(() => {
-    //             setStyledColor('#F4511E');
-    //         }, i * 4)
-    //     }
-    // }
-    // for (let i = 0; i < arrayState.length; i++){
-    //     const changeColor = selectedOption[i] === "first-comparison" || selectedOption[i] === "second-comparison";
-    //     if (changeColor){
-    //         const [change] = selectedOption[i];
-    //         const color = (change === "first-comparison" ? default_color : swap_color);
-    //     }
-    // }
-}
 
 interface DisplayGraphProps {
     graphArray : number[];
-    isSwapping: boolean;
 }
 
-export const DisplayGraph: React.FC<DisplayGraphProps> = (props) => {
-    const [styledColor, setStyledColor] = useState('#4A148C');
-    // let color;
-    return (
-        <Wrapper>
-            <GraphOutline>
-                {props.graphArray.map((numbers, index) => {
-                        for (let i = 0; i < props.graphArray.length; i++){
-                            if (i === props.graphArray.length - 1 || i === props.graphArray.length - 2 || i === props.graphArray.length - 3){
-                                setTimeout(() => {
-                                    setStyledColor('#F4511E');
-                                }, i * 4)
-                            }
-                        }
-                    // props.isSwapping ? (color = '#F4511E') : color = '#4A148C'
-                return (
-                    <HeightBars height={`${numbers}vh`} key={index} color={styledColor}/>
-                )})}
-            </GraphOutline>
-        </Wrapper>
-    )
-}
+export const DisplayGraph: React.FC<DisplayGraphProps> = (props) => (
+    <Wrapper>
+        <GraphOutline>
+            {props.graphArray.map((numbers, index) => (
+                <div className='HeightBars' key={index} style={{
+                    height: `${numbers}vh`,
+                    backgroundColor: '#F28482'
+                }}>
+                </div>
+            ))}
+        </GraphOutline>
+    </Wrapper>
+);
