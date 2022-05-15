@@ -1,7 +1,7 @@
 # Sorting Algorithm Visualizer
 Visualize common sorting algorithms! 
 
-## Languages and Tools
+## Tech Stack
 
 - TypeScript, React
 - Styled-components
